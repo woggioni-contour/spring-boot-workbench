@@ -1,0 +1,54 @@
+plugins {
+    id 'java-library'
+    id 'net.woggioni.gradle.lombok'
+}
+
+group = 'net.woggioni'
+
+version = getProperty('spring.data.surgery.version')
+
+repositories {
+    mavenCentral()
+}
+
+lombok {
+    version = getProperty('lombok.version')
+}
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: getProperty('spring.boot.version')
+
+    runtimeOnly group: 'com.h2database', name: 'h2', version: getProperty('h2.version')
+    runtimeOnly group: 'javax.xml.bind', name: 'jaxb-api', version: getProperty('jaxb.version')
+    runtimeOnly group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: getProperty('spring.boot.version')
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: getProperty('junit.jupiter.version')
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: getProperty('junit.jupiter.version')
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: getProperty('junit.jupiter.version')
+    testImplementation group: 'org.springframework', name: 'spring-test', version: getProperty('spring.version')
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure', version: getProperty('spring.boot.version')
+
+
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: getProperty('junit.jupiter.version')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+wrapper {
+    distributionType = Wrapper.DistributionType.BIN
+    gradleVersion = getProperty('gradle.version')
+}
+
+tasks.register('run', JavaExec) { JavaExec t ->
+    classpath = configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME) +
+            sourceSets.main.output.classesDirs + project.files(sourceSets.main.output.resourcesDir)
+    mainClass = 'net.woggioni.spring.data.surgery.Main'
+}
